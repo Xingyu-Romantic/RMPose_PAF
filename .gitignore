@@ -1,0 +1,3 @@
+pose_model.pdparams
+VGG19_pretrained.pdparams
+lib/network/*.pth
