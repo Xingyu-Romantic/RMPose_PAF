@@ -25,7 +25,7 @@ python training/train_pose.py --config ./trainning/config.yml --train_dir ./proc
 python testing/eval_new.py
 ```
 
-![](./pckh.png)
+![](https://github.com/Xingyu-Romantic/RMPose_PAF/blob/main/result.png)
 
 ## Inference
 
