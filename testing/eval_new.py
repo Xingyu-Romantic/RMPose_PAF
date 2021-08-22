@@ -421,11 +421,15 @@ if __name__ == '__main__':
     images = {}
     for i in tqdm(range(len(pred))):
         images[pred[i]['image']] = cv2.imread('../data/mpii/images/' + pred[i]['image'])
-    # generate image with body parts
-    preds = np.zeros((len(pred), 16, 2))
-    for i in tqdm(range(len(pred))):
-        process(model, images[pred[i]['image']], pred[i], i)
-    np.save("predection.npy",predection)
+    
+
+    #preds = np.zeros((len(pred), 16, 2))
+    #for i in tqdm(range(len(pred))):
+    #    process(model, images[pred[i]['image']], pred[i], i)
+    #np.save("predection.npy",preds)
+
+    preds = np.load("predection.npy")
+
     eval_mpii(preds)
     toc = time.time()
     print ('processing time is %.5f' % (toc - tic))
