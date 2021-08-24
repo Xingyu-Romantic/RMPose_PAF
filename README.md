@@ -2,11 +2,11 @@
 
 # RMPose_PAF
 
-[TOC]
 
 
 
-Ai Studio: https://aistudio.baidu.com/aistudio/projectdetail/2267186?shared=1
+
+Ai Studio: [https://aistudio.baidu.com/aistudio/projectdetail/2306743](https://aistudio.baidu.com/aistudio/projectdetail/2306743)
 
 《Realtime Multi-Person 2D Pose Estimation using Part Affinity Fields ∗ 》论文复现
 
