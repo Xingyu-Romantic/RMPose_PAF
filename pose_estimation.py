@@ -157,14 +157,8 @@ def PoseModel(num_point, num_vector, num_stages=6, batch_norm=False, pretrained=
 
     if pretrained:
         parameter_num = 10
-        if batch_norm:
-            vgg19 = models.vgg19_bn(pretrained=True)
-            parameter_num *= 6
-        else:
-            vgg19 = models.vgg19(pretrained=True)
-            parameter_num *= 2
-        vgg19_state_dict = paddle.load('model.pdparams')
-        vgg19_keys = vgg19_state_dict.keys()
+        vgg19_state_dict = paddle.load('vgg19.pdparams')
+        vgg19_keys = list(vgg19_state_dict.keys())
 
         model_dict = model.state_dict()
         from collections import OrderedDict

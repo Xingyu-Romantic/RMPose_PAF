@@ -33,10 +33,10 @@ def pre(annot_file):
                 #j['info'].append({'scale':i['scale'], 'center': i['center'], 'joints':key.tolist()})
     for j in gt_valid_multi:
         j['keypoint_multi'] = j['keypoint_multi'].tolist()
-    with open('process_valid_gt.json', 'w') as f:
+    with open( './datasets/process_' + annot_file.split('/')[-1], 'w') as f:
         json.dump(gt_valid_multi, f)
     
 
 pre('../data/mpii/annot/valid.json')
-#pre('../data/mpii/annot/trainval.json')
-#pre('../data/mpii/annot/valid.json')
+pre('../data/mpii/annot/trainval.json')
+pre('../data/mpii/annot/valid.json')

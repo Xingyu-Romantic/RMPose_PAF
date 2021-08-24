@@ -46,7 +46,7 @@ stickwidth = 7
 def construct_model(args):
 
     model = pose_estimation.PoseModel(num_point=16, num_vector=14)
-    state_dict = paddle.load(args.model)
+    state_dict = paddle.load(args.model)['state_dict']
     model.set_state_dict(state_dict)
     model.eval()
 
@@ -86,7 +86,7 @@ def normalize(origin_img):
 
 def eval_mpii(preds):
 
-    debug = 0
+
     threshold = 0.5
     SC_BIAS = 0.6
     dict = loadmat('../data/mpii/annot/gt_valid.mat')
@@ -215,9 +215,6 @@ def process(model, image, meta, index1):
         paf_avg = paf_avg + paf / len(multiplier)
     
     #print(heatmap_avg)
-    joint_list_per_joint_type = []  # all of the possible points by classes.
-    cnt_total_joints = 0
-    win_size = 2
 
     # non-maximum suppression for finding joint candidates
     all_peaks = []   # all of the possible points by classes.
@@ -401,9 +398,8 @@ def process(model, image, meta, index1):
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('--image', type=str, required=False, help='input image')
-    parser.add_argument('--output', type=str, default='result.png', help='output image')
     parser.add_argument('--model', type=str, default='pose_iter_rename.pdparams', help='path to the weights file')
+    parser.add_argument('-only_eval', type=bool, help='./output/predection.npy exists')
 
     args = parser.parse_args()
 
@@ -418,18 +414,17 @@ if __name__ == '__main__':
         pred = json.load(f)
     pred = pred
     
-    images = {}
-    for i in tqdm(range(len(pred))):
-        images[pred[i]['image']] = cv2.imread('../data/mpii/images/' + pred[i]['image'])
-    
-
-    #preds = np.zeros((len(pred), 16, 2))
-    #for i in tqdm(range(len(pred))):
-    #    process(model, images[pred[i]['image']], pred[i], i)
-    #np.save("predection.npy",preds)
-
-    preds = np.load("predection.npy")
-
+    if args.only_eval:
+        preds = np.load('./output/predection.npy')
+    else:
+        images = {}
+        for i in tqdm(range(len(pred))):
+            images[pred[i]['image']] = cv2.imread('../data/mpii/images/' + pred[i]['image'])
+        # generate image with body parts
+        preds = np.zeros((len(pred), 16, 2))
+        for i in tqdm(range(len(pred))):
+            process(model, images[pred[i]['image']], pred[i], i)
+        np.save("./output/predection.npy",preds)
     eval_mpii(preds)
     toc = time.time()
     print ('processing time is %.5f' % (toc - tic))

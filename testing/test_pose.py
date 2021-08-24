@@ -7,6 +7,7 @@ import time
 import argparse
 
 import cv2
+import imghdr
 import numpy as np
 
 import paddle
@@ -35,13 +36,7 @@ stickwidth = 7
 def construct_model(args):
 
     model = pose_estimation.PoseModel(num_point=16, num_vector=14)
-    state_dict = paddle.load(args.model)
-    #new_state_dict = OrderedDict()
-    #for k, v in state_dict.items():
-    #    name = k[7:]
-    #    new_state_dict[name] = v
-    #state_dict = model.state_dict()
-    #state_dict.update(new_state_dict)
+    state_dict = paddle.load(args.model)['state_dict']
     model.set_state_dict(state_dict)
     model.eval()
 
@@ -300,16 +295,34 @@ def process(model, input_path):
             canvas = cv2.addWeighted(canvas, 0.4, cur_canvas, 0.6, 0)
     return canvas
 
+def get_image_file_list(img_file):
+    imgs_lists = []
+    if img_file is None or not os.path.exists(img_file):
+        raise Exception("not found any img file in {}".format(img_file))
+
+    img_end = {'jpg', 'bmp', 'png', 'jpeg', 'rgb', 'tif', 'tiff', 'gif', 'GIF'}
+    if os.path.isfile(img_file) and imghdr.what(img_file) in img_end:
+        imgs_lists.append(img_file)
+    elif os.path.isdir(img_file):
+        for single_file in os.listdir(img_file):
+            file_path = os.path.join(img_file, single_file)
+            if os.path.isfile(file_path) and imghdr.what(file_path) in img_end:
+                imgs_lists.append(file_path)
+    if len(imgs_lists) == 0:
+        raise Exception("not found any img file in {}".format(img_file))
+    imgs_lists = sorted(imgs_lists)
+    return imgs_lists
+
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('--image', type=str, required=True, help='input image')
-    parser.add_argument('--output', type=str, default='result.png', help='output image')
-    parser.add_argument('--model', type=str, default='pose_iter_rename.pdparams', help='path to the weights file')  #pose_iter_rename.pdparams
+    parser.add_argument('--image_dir', type=str, required=True, help='input image')
+    parser.add_argument('--output_dir', type=str, default='./output', help='output image')
+    parser.add_argument('--model', type=str, default='RMPose_PAFs.pdparams.tar', help='path to the weights file')  #pose_iter_rename.pdparams
 
     args = parser.parse_args()
-    input_image = args.image
-    output = args.output
+    input_image = args.image_dir
+    output = args.output_dir
 
 
     # load model
@@ -318,10 +331,11 @@ if __name__ == '__main__':
     tic = time.time()
     print('start processing...')
 
-    # generate image with body parts
-    canvas = process(model, input_image)
-
+    image_list = get_image_file_list(input_image)
+    for i in image_list:
+        canvas = process(model, i)
+        save_path = os.path.join(output, i.split('/')[-1])
+        cv2.imwrite(save_path, canvas)
+        print('Result saved {}'.format(save_path))
     toc = time.time()
     print ('processing time is %.5f' % (toc - tic))
-
-    cv2.imwrite(output, canvas)

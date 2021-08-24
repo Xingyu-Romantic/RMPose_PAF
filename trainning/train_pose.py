@@ -12,6 +12,7 @@ from utils import save_checkpoint as save_checkpoint
 from utils import Config as Config
 import pose_estimation
 import numpy as np
+
 def parse():
 
     parser = argparse.ArgumentParser()
@@ -211,5 +212,4 @@ if __name__ == '__main__':
     paddle.set_device('gpu')
     args = parse()
     model = construct_model(args)
-    #model.set_state_dict(paddle.load('MPII_N.pdparams'))
     train_val(model, args)

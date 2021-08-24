@@ -175,9 +175,9 @@ def final_preds(output, center, scale, res):
 
 def save_checkpoint(state, is_best, filename='checkpoint.pdparams.tar'):
 
-    paddle.save(state, filename + '_latest.pdparams.tar')
+    paddle.save(state, './output/' + filename + '_latest.pdparams.tar')
     if is_best:
-        shutil.copyfile(filename + '_latest.pdparams.tar', filename + '_best.pdparams.tar')
+        shutil.copyfile('./output/' + filename + '_latest.pdparams.tar', './output/' + filename + '_best.pdparams.tar')
 
 def Config(filename):
     with open(filename, 'r') as f:
